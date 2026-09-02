@@ -34,8 +34,8 @@ return {
           ["@type.builtin"]     = { fg = "#f5ede0" },
 
           -- User-defined types (class/struct names): warm gold — distinct from keywords
-          ["@type"]             = { fg = "gold" },
-          ["Type"]              = { fg = "gold" },
+          ["@type"]             = { fg = "#d4a84b" },  -- warm gold
+          ["Type"]              = { fg = "#d4a84b" },  -- warm gold
 
           -- Storage class fallback (non-TS)
           ["@storageclass"]     = { fg = "#f5ede0" },
