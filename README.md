@@ -40,7 +40,7 @@ dotfiles/
 Clone the repo and use `stow` to symlink the configs into your home directory:
 
 ```bash
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone https://github.com/Omargherita/Dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
 # Install all configs
