@@ -1,8 +1,5 @@
 return {
-  { "rose-pine/neovim", name = "rose-pine",
-    -- priority removed: pywal.nvim (priority 1001) is the active colorscheme
-    -- when ~/.cache/wal/ exists. rose-pine remains available as a fallback
-    -- via :colorscheme rose-pine-moon
+  { "rose-pine/neovim", name = "rose-pine", priority = 1000,
     config = function()
       require("rose-pine").setup({
         variant = "moon",
@@ -45,9 +42,7 @@ return {
           ["StorageClass"]      = { fg = "#f5ede0" },
         },
       })
-      -- colorscheme activation moved to pywal.lua (priority 1001).
-      -- Uncomment the line below to restore rose-pine as the active theme:
-      -- vim.cmd.colorscheme("rose-pine-moon")
+      vim.cmd.colorscheme("rose-pine-moon")
     end,
   },
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", opts = {
