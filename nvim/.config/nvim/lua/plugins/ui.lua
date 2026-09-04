@@ -1,53 +1,15 @@
 return {
-  { "rose-pine/neovim", name = "rose-pine",
-    -- priority removed: pywal.nvim (priority 1001) is the active colorscheme
-    -- when ~/.cache/wal/ exists. rose-pine remains available as a fallback
-    -- via :colorscheme rose-pine-moon
+  { "Mofiqul/vscode.nvim",
+    lazy     = false,
+    priority = 1000,
     config = function()
-      require("rose-pine").setup({
-        variant = "moon",
-        dark_variant = "moon",
-        styles = {
-          bold = true,
-          italic = true,
-          transparency = false,
-        },
-        -- Override the moon palette: pure black bg + cold purple text tones
-        palette = {
-          moon = {
-            base    = "#0f0d0a",  -- near-black dark charcoal, subtle warmth
-            surface = "#171410",  -- panels/sidebars
-            overlay = "#1e1a14",  -- floating windows, popups
-            muted   = "#6b4f30",  -- dimmed text, line numbers — sienna
-            subtle  = "#9b7248",  -- secondary text — mid-tan
-            text    = "#d8c4a2",  -- main text — warm parchment/sand
-          },
-        },
-        highlight_groups = {
-          -- Keywords (namespace, using, return, if, class, ...): warm white
-          ["@keyword"]          = { fg = "#f5ede0" },
-          ["@keyword.modifier"] = { fg = "#f5ede0" },  -- public, private, static...
-          ["@keyword.import"]   = { fg = "#f5ede0" },  -- using, namespace
-          ["@keyword.type"]     = { fg = "#f5ede0" },  -- enum, struct, class, interface
-          ["@keyword.operator"] = { fg = "#f5ede0" },  -- new, typeof, sizeof, is, as
-          ["Keyword"]           = { fg = "#f5ede0" },  -- fallback (non-TS files)
-          ["Statement"]         = { fg = "#f5ede0" },  -- vim legacy fallback
-
-          -- Builtin types (string, int, bool, void, ...): white — they're keywords
-          ["@type.builtin"]     = { fg = "#f5ede0" },
-
-          -- User-defined types (class/struct names): warm gold — distinct from keywords
-          ["@type"]             = { fg = "#d4a84b" },  -- warm gold
-          ["Type"]              = { fg = "#d4a84b" },  -- warm gold
-
-          -- Storage class fallback (non-TS)
-          ["@storageclass"]     = { fg = "#f5ede0" },
-          ["StorageClass"]      = { fg = "#f5ede0" },
-        },
+      require("vscode").setup({
+        style                = "dark",
+        transparent          = true,   -- use terminal (Kitty) bg instead of VS grey
+        italic_comments      = true,
+        disable_nvimtree_bg  = true,
       })
-      -- colorscheme activation moved to pywal.lua (priority 1001).
-      -- Uncomment the line below to restore rose-pine as the active theme:
-      -- vim.cmd.colorscheme("rose-pine-moon")
+      vim.cmd.colorscheme("vscode")
     end,
   },
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", opts = {

@@ -14,3 +14,10 @@ vim.g.maplocalleader = " "
 
 require("options")
 require("lazy").setup("plugins")
+
+-- Automatically enable tree-sitter highlighting for all buffers with installed parsers
+vim.api.nvim_create_autocmd({ "FileType", "BufReadPost", "BufNewFile" }, {
+  callback = function(args)
+    pcall(vim.treesitter.start, args.buf)
+  end,
+})
