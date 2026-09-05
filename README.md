@@ -15,6 +15,10 @@ dotfiles/
     └── .config/nvim/
         ├── init.lua                # Entry point (lazy.nvim bootstrap & Treesitter autocmd)
         ├── lazy-lock.json          # Plugin lockfile
+        ├── after/
+        │   └── queries/
+        │       └── c_sharp/
+        │           └── highlights.scm # Custom Treesitter highlight queries (methods & types)
         └── lua/
             ├── options.lua         # Editor options & diagnostics
             └── plugins/
@@ -22,7 +26,7 @@ dotfiles/
                 ├── completion.lua  # nvim-cmp + LuaSnip
                 ├── formatting.lua  # conform.nvim (CSharpier on save)
                 ├── debugging.lua   # nvim-dap + netcoredbg (C#/.NET)
-                ├── csharp.lua      # Roslyn LSP + Razor support
+                ├── csharp.lua      # Roslyn LSP + Razor support (semantic tokens fix)
                 └── git.lua         # gitsigns.nvim
 ```
 
@@ -82,6 +86,14 @@ Neovim will auto-install [lazy.nvim](https://github.com/folke/lazy.nvim) and all
 - **Italics:** Italic comments enabled
 - **Treesitter:** Auto-highlighting is enabled for buffers on `FileType`, `BufReadPost`, and `BufNewFile` whenever a parser is installed.
 
+### C# LSP & Semantic Highlighting
+
+- **Roslyn LSP (`lua/plugins/csharp.lua`):**
+  - **Range Request Clamping:** Intercepts outgoing `textDocument/semanticTokens/range` LSP requests to clamp out-of-bounds `end_line` values. Neovim can send `line_count` as the end line index, which triggers an unhandled `ArgumentOutOfRangeException` in Roslyn.
+  - **Auto-Refresh Semantic Tokens:** Hooks `workspace/projectInitializationComplete` and adds staggered refreshes (1200ms, 2500ms, 4500ms) on `LspAttach` so syntax tokens populate automatically once background solution compilation finishes.
+- **Custom Treesitter Queries (`after/queries/c_sharp/highlights.scm`):**
+  - Extends Treesitter queries with prioritized patterns for PascalCase type detection (`@type`), static and member method invocations (`@function.method.call`), and member accesses, providing crisp highlighting before and alongside LSP semantic tokens.
+
 ### Key Mappings
 
 `<leader>` and `<localleader>` are both `Space`.
@@ -111,9 +123,33 @@ Neovim will auto-install [lazy.nvim](https://github.com/folke/lazy.nvim) and all
 
 ## Kitty
 
-### Theming
+### Theming & Material You Engine Integration
 
-Kitty uses the static **`themes/cold-frost.conf`** ("Obsidian Cold Monochrome") theme. It is a custom monochrome palette built around pure blacks, cool greys, and dark cold steel accents. Only errors, warnings, success, and info hints carry color, with window border colors configured directly within the theme.
+Kitty supports both a static monochrome theme and dynamic wallpaper-driven theming integrated with [kde-material-you-colors](https://github.com/luisbocanegra/kde-material-you-colors) and [pywal](https://github.com/dylanaraps/pywal):
+
+- **Static Theme:** `themes/cold-frost.conf` ("Obsidian Cold Monochrome") — built around pure blacks, cool greys, and dark cold steel accents. Only errors, warnings, success, and info hints carry color.
+- **Dynamic Theming:** Regenerates `~/.cache/wal/colors-kitty.conf` and updates running terminal sessions whenever wallpaper changes.
+
+#### Material You Color Realism & Vibrance Overhaul
+
+By default, stock `kde-material-you-colors` blended terminal ANSI colors 95% toward neutral white (`tones_neutral[99]`) in dark mode (and neutral black in light mode). This stripped all saturation, producing washed-out, pastel, virtually monochromatic syntax highlighting in terminals and Neovim.
+
+To restore realistic color separation and vivid personality, the color generation engine was customized:
+
+1. **Semantic ANSI Palette Mapping (`schemeconfigs.py`):**
+   - Maps terminal ANSI color slots directly to functional Material Design 3 tonal palettes:
+     - `color1` (Red): Error palette (tone 65 dark / tone 48 light)
+     - `color2` (Green): Tertiary palette (tone 65 dark / tone 45 light)
+     - `color3` (Yellow): Secondary + tertiary blend (tone 68/62 dark / tone 48/44 light)
+     - `color4` (Blue): Primary accent palette (tone 68 dark / tone 46 light)
+     - `color5` (Magenta): Error + primary cross-blend (rotates hue)
+     - `color6` (Cyan): Tertiary + secondary cross-blend
+     - `color7` (White/FG): Neutral tone 90 dark / tone 20 light
+2. **HCT Perceptual Chroma Boost (`color_utils.py`):**
+   - Added `boost_chroma(hex_color, multiplier=2.0, min_chroma=48.0)` using Google's HCT (Hue, Chroma, Tone) color space.
+   - Enforces a minimum chroma floor of 48 and doubles saturation, preventing analogous wallpaper palettes from collapsing into dull, low-contrast pastels while maintaining exact perceptual luminance.
+3. **Balanced Neutral Blending:**
+   - Replaced the aggressive 95% neutral dilution with a subtle 15% neutral blend, preserving wallpaper harmony while keeping syntax tokens punchy and distinct.
 
 ### Highlights
 
