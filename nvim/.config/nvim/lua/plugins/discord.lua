@@ -2,6 +2,15 @@ return {
   { "vyfor/cord.nvim",
     build = ":Cord update",
     opts = {
+        idle = {
+            enabled = true,
+            timeout = 900000,
+            show_status = true,
+            ignore_focus = true,
+            unidle_on_focus = true,
+            smart_idle = true,
+            details = "idling",
+        },
       display = {
         theme  = "default",
         flavor = "accent", -- language-coloured icon backgrounds

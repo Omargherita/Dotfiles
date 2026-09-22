@@ -13,6 +13,34 @@ return {
     config = function(_, opts)
       require("roslyn").setup(opts)
 
+      -- ── IDE0003 / IDE0009 client-side filter ("suspenders") ─────────────────
+      -- The editorconfig layer asks Roslyn not to emit these, but it can be
+      -- blocked by a project's own `root = true` .editorconfig or by the
+      -- project simply not having one that inherits our preference.  This
+      -- handler intercepts the raw `textDocument/publishDiagnostics` RPC
+      -- payload *before* Neovim stores it, so IDE0003/IDE0009 never appear
+      -- in the diagnostic list regardless of what any .editorconfig says.
+      local SUPPRESSED_CODES = { IDE0003 = true, IDE0009 = true }
+
+      local orig_publish = vim.lsp.handlers["textDocument/publishDiagnostics"]
+      vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config_)
+        if result and result.diagnostics then
+          local client = vim.lsp.get_client_by_id(ctx.client_id)
+          if client and client.name == "roslyn" then
+            local filtered = {}
+            for _, diag in ipairs(result.diagnostics) do
+              local code = diag.code
+              if not (code and SUPPRESSED_CODES[tostring(code)]) then
+                filtered[#filtered + 1] = diag
+              end
+            end
+            result.diagnostics = filtered
+          end
+        end
+        orig_publish(err, result, ctx, config_)
+      end
+      -- ────────────────────────────────────────────────────────────────────────
+
       -- Hook workspace/projectInitializationComplete to auto-refresh semantic tokens
       local orig_handler = vim.lsp.config["roslyn"]
         and vim.lsp.config["roslyn"].handlers
